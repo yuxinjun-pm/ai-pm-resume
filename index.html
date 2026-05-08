@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>於鑫君 · AI产品经理</title>
+<meta name="description" content="於鑫君，8年AI产品经理，复旦MBA，PMP认证，专注AI技术落地、用户增长、商业化变现">
+<meta property="og:title" content="於鑫君 · AI产品经理">
+<meta property="og:description" content="8年AI产品经验，复旦MBA，PMP认证">
+<meta property="og:type" content="website">
+<style>
+/* ===== CSS Variables & Themes ===== */
+:root {
+  --bg: #f5f5f7; --surface: #ffffff; --surface-2: #fbfbfd;
+  --border: rgba(0,0,0,0.08); --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73; --text-tertiary: #86868b;
+  --accent: #0071e3; --accent-soft: rgba(0,113,227,0.08);
+  --accent-mid: rgba(0,113,227,0.14); --tag-bg: #f0f0f0;
+  --nav-bg: rgba(245,245,247,0.85);
+  --radius-sm: 8px; --radius-md: 14px; --radius-lg: 20px;
+  --shadow-card: 0 2px 20px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-hover: 0 8px 40px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.05);
+  --transition: 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --particle-color: rgba(0,113,227,0.15);
+}
+[data-theme="dark"] {
+  --bg: #000000; --surface: #1c1c1e; --surface-2: #2c2c2e;
+  --border: rgba(255,255,255,0.1); --text-primary: #f5f5f7;
+  --text-secondary: #98989d; --text-tertiary: #636366;
+  --accent: #0a84ff; --accent-soft: rgba(10,132,255,0.12);
+  --accent-mid: rgba(10,132,255,0.2); --tag-bg: rgba(255,255,255,0.08);
+  --nav-bg: rgba(0,0,0,0.75); --shadow-card: 0 2px 20px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+  --shadow-hover: 0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+  --particle-color: rgba(10,132,255,0.2);
+}
+
+/* ===== Reset & Base ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background var(--transition), color var(--transition);
+  overflow-x: hidden;
+}
+
+/* ===== Canvas Particle Background ===== */
+#particle-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ===== Nav ===== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--nav-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition), border-color var(--transition);
+}
+.nav.scrolled {
+  background: var(--surface);
+  border-bottom-color: var(--border);
+}
+.nav-inner {
+  width: 100%; max-width: 900px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-name {
+  font-size: 15px; font-weight: 600;
+  letter-spacing: -0.2px; color: var(--text-primary);
+}
+.nav-links {
+  display: flex; gap: 28px; list-style: none;
+}
+.nav-links a {
+  font-size: 13px; color: var(--text-secondary);
+  text-decoration: none; font-weight: 400;
+  transition: color var(--transition);
+  position: relative; padding-bottom: 2px;
+}
+.nav-links a::after {
+  content: ''; position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 2px; background: var(--accent);
+  border-radius: 1px;
+  transform: scaleX(0);
+  transition: transform var(--transition);
+}
+.nav-links a.active::after, .nav-links a:hover::after { transform: scaleX(1); }
+.nav-links a:hover { color: var(--accent); }
+
+/* Theme Toggle */
+.theme-toggle {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+  position: relative; overflow: hidden;
+}
+.theme-toggle:hover { border-color: var(--accent); transform: scale(1.08); }
+.theme-toggle svg { width: 16px; height: 16px; transition: all 0.3s; }
+.theme-toggle .sun { position: absolute; opacity: 1; transform: rotate(0deg); }
+.theme-toggle .moon { position: absolute; opacity: 0; transform: rotate(-90deg); }
+[data-theme="dark"] .theme-toggle .sun { opacity: 0; transform: rotate(90deg); }
+[data-theme="dark"] .theme-toggle .moon { opacity: 1; transform: rotate(0deg); }
+
+/* ===== Page Container ===== */
+.page {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  padding: 84px 24px 80px;
+}
+
+/* ===== Hero ===== */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px; align-items: center;
+  padding: 52px 0 48px;
+  border-bottom: 1px solid var(--border);
+  min-height: 280px;
+}
+.hero-text {}
+.hero-eyebrow {
+  font-size: 13px; font-weight: 500;
+  color: var(--accent); letter-spacing: 0.04em;
+  text-transform: uppercase; margin-bottom: 10px;
+  opacity: 0; transform: translateY(12px);
+  animation: fadeUp 0.6s ease forwards 0.1s;
+}
+.hero-name {
+  font-size: clamp(40px, 6vw, 56px);
+  font-weight: 700; letter-spacing: -0.03em;
+  line-height: 1.07; color: var(--text-primary);
+  margin-bottom: 14px;
+  overflow: hidden; white-space: nowrap;
+  border-right: 3px solid var(--accent);
+  animation: blink 0.8s step-end infinite;
+}
+.hero-tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 20px;
+  opacity: 0; transform: translateY(12px);
+  animation: fadeUp 0.6s ease forwards 0.3s;
+}
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-secondary); background: var(--tag-bg);
+  padding: 5px 12px; border-radius: 100px;
+  transition: all var(--transition);
+}
+.hero-tag.accent { background: var(--accent-soft); color: var(--accent); }
+.hero-tag:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.hero-contact {
+  display: flex; flex-wrap: wrap; gap: 20px;
+  opacity: 0; transform: translateY(12px);
+  animation: fadeUp 0.6s ease forwards 0.4s;
+}
+.contact-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13.5px; color: var(--text-secondary);
+  text-decoration: none; transition: color var(--transition);
+}
+.contact-item:hover { color: var(--accent); }
+.contact-item svg { flex-shrink: 0; }
+
+.hero-photo {
+  opacity: 0; transform: scale(0.95);
+  animation: fadeIn 0.7s ease forwards 0.3s;
+}
+.hero-photo img {
+  width: 100px; height: 140px; object-fit: cover;
+  border-radius: 14px; display: block;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+}
+.hero-photo-placeholder {
+  width: 100px; height: 140px; border-radius: 14px;
+  background: linear-gradient(135deg, #e8e8ed 0%, #d1d1d6 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+/* ===== Section ===== */
+.section {
+  padding: 44px 0 0;
+  opacity: 0; transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.section.visible { opacity: 1; transform: translateY(0); }
+.section-header {
+  display: flex; align-items: baseline; gap: 12px;
+  margin-bottom: 24px;
+}
+.section-label {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent);
+}
+.section-title {
+  font-size: 22px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-primary);
+}
+.section-divider {
+  flex: 1; height: 1px;
+  background: var(--border); margin-left: 4px;
+}
+
+/* ===== Layout Toggle ===== */
+#layout-toggle-bar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 0 0 0;
+}
+#layout-toggle-bar span { font-size: 12px; color: var(--text-tertiary); }
+.layout-btn {
+  font-size: 12px; padding: 5px 14px;
+  border-radius: 100px; cursor: pointer;
+  font-weight: 500; transition: all 0.2s;
+}
+#btn-before {
+  border: 1.5px solid var(--accent); background: var(--accent); color: #fff;
+}
+#btn-after {
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--text-secondary);
+}
+
+/* ===== Competency Grid ===== */
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.comp-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 20px 16px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition), transform var(--transition);
+  cursor: default;
+  transform-style: preserve-3d;
+  perspective: 800px;
+  will-change: transform;
+}
+.comp-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+.comp-card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+  transition: transform var(--transition);
+}
+.comp-card:hover .comp-card-icon { transform: scale(1.1) rotate(5deg); }
+
+/* CSS Animated Icons */
+.icon-ai {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent), transparent, var(--accent), transparent, var(--accent));
+  animation: spin 3s linear infinite;
+  position: relative;
+}
+.icon-ai::after {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 12px; height: 12px;
+  border-radius: 50%; background: var(--accent);
+}
+.icon-growth {
+  width: 22px; height: 22px;
+  position: relative;
+}
+.icon-growth::before {
+  content: ''; position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 0;
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-bottom: 22px solid var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+.icon-growth::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0;
+  width: 8px; height: 8px;
+  background: var(--bg);
+  border-radius: 2px 2px 0 0;
+  animation: growUp 2s ease-in-out infinite;
+}
+.icon-algo {
+  width: 22px; height: 22px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  position: relative;
+}
+.icon-algo::before {
+  content: ''; position: absolute;
+  top: -3px; left: 50%; transform: translateX(-50%);
+  width: 6px; height: 6px;
+  background: var(--accent); border-radius: 50%;
+  animation: orbit 2s linear infinite;
+}
+.icon-algo::after {
+  content: ''; position: absolute;
+  top: 50%; left: 50%;
+  width: 6px; height: 6px;
+  background: var(--accent); border-radius: 50%;
+}
+.icon-money {
+  width: 22px; height: 22px;
+  border: 3px solid var(--accent);
+  border-radius: 4px;
+  position: relative;
+}
+.icon-money::before {
+  content: '¥'; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 12px; font-weight: bold; color: var(--accent);
+  font-family: serif;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+@keyframes growUp { 0% { height: 8px; } 50% { height: 18px; } 100% { height: 8px; } }
+@keyframes orbit { to { transform: translateX(-50%) rotate(360deg); } }
+
+.comp-card-title {
+  font-size: 13px; font-weight: 700;
+  color: var(--text-primary); margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+.comp-card-items { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.comp-card-items li {
+  font-size: 12px; color: var(--text-secondary);
+  line-height: 1.4; display: flex;
+  align-items: flex-start; gap: 5px;
+}
+.comp-card-items li::before {
+  content: ''; width: 4px; height: 4px;
+  border-radius: 50%; background: var(--accent);
+  flex-shrink: 0; margin-top: 5px; opacity: 0.6;
+}
+
+/* Counter animation */
+.counter { font-variant-numeric: tabular-nums; }
+.counter-wrap { display: inline-flex; align-items: baseline; gap: 2px; }
+
+/* ===== Experience Timeline ===== */
+.exp-list { display: flex; flex-direction: column; gap: 0; position: relative; }
+
+/* Timeline line */
+.exp-list::before {
+  content: ''; position: absolute;
+  left: 119px; top: 0; bottom: 0;
+  width: 2px; background: var(--border);
+}
+#timeline-progress {
+  position: absolute;
+  left: 119px; top: 0;
+  width: 2px; height: 0;
+  background: linear-gradient(to bottom, var(--accent), rgba(0,113,227,0.3));
+  transition: height 0.1s linear;
+}
+
+.exp-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: box-shadow var(--transition), transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin-bottom: 12px;
+  position: relative;
+  opacity: 0;
+  transform: translateX(-40px);
+}
+.exp-card.slide-in { opacity: 1; transform: translateX(0); }
+.exp-card:hover { box-shadow: var(--shadow-hover); }
+
+/* Timeline dot */
+.exp-card::before {
+  content: ''; position: absolute;
+  left: 112px; top: 28px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--accent);
+  z-index: 2;
+  transition: all var(--transition);
+}
+.exp-card:hover::before {
+  background: var(--accent);
+  transform: scale(1.2);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+.exp-card:last-child { margin-bottom: 0; }
+
+.exp-card-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 16px;
+  padding: 22px 24px 18px 140px;
+  cursor: pointer; user-select: none;
+  position: relative;
+}
+.exp-card-header::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 140px; right: 24px;
+  height: 1px; background: var(--border);
+  opacity: 0; transition: opacity var(--transition);
+}
+.exp-card.open .exp-card-header::after { opacity: 1; }
+.exp-header-left { flex: 1; min-width: 0; }
+.exp-company {
+  font-size: 16px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.exp-role {
+  font-size: 13px; color: var(--accent); font-weight: 500;
+  margin-bottom: 2px;
+}
+.exp-header-right {
+  display: flex; flex-direction: column;
+  align-items: flex-end; gap: 8px; flex-shrink: 0;
+}
+.exp-period { font-size: 12px; color: var(--text-tertiary); font-weight: 500; white-space: nowrap; }
+.exp-toggle {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--tag-bg);
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--transition), transform var(--transition);
+  flex-shrink: 0;
+}
+.exp-card.open .exp-toggle { background: var(--accent-soft); transform: rotate(180deg); }
+.exp-toggle svg { transition: transform var(--transition); }
+
+.exp-card-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.exp-card.open .exp-card-body { max-height: 2000px; }
+.exp-card-body-inner { padding: 20px 24px 24px 140px; }
+
+/* Project Block */
+.project-block { margin-bottom: 20px; }
+.project-block:last-child { margin-bottom: 0; }
+.project-name {
+  font-size: 13px; font-weight: 700; color: var(--text-primary);
+  padding: 6px 10px; background: var(--accent-soft);
+  border-radius: var(--radius-sm); margin-bottom: 10px;
+  display: inline-block; letter-spacing: -0.01em;
+}
+.bullet-list { display: flex; flex-direction: column; gap: 6px; }
+.bullet-item {
+  font-size: 13px; line-height: 1.6; color: var(--text-primary);
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.bullet-item .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); flex-shrink: 0;
+  margin-top: 6px; opacity: 0.7;
+}
+.bullet-item b { color: var(--text-primary); font-weight: 600; }
+.bullet-item .text { flex: 1; }
+.sub-bullet-item {
+  font-size: 12.5px; line-height: 1.55; color: var(--text-secondary);
+  display: flex; gap: 8px; align-items: flex-start; padding-left: 14px;
+}
+.sub-bullet-item .dot-sub {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--text-tertiary); flex-shrink: 0; margin-top: 7px;
+}
+.metrics-row {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+}
+.metric-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11.5px; font-weight: 600;
+  color: var(--accent); background: var(--accent-soft);
+  padding: 4px 10px; border-radius: 100px; white-space: nowrap;
+}
+.metric-chip .metric-num {
+  font-variant-numeric: tabular-nums;
+  transition: all 0.3s;
+}
+
+/* ===== AI Projects Section (movable) ===== */
+#ai-projects-wrapper { }
+
+/* ===== Education ===== */
+.edu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.edu-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 22px 20px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.edu-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.edu-card-icon { font-size: 24px; margin-bottom: 12px; }
+.edu-school {
+  font-size: 15px; font-weight: 700;
+  letter-spacing: -0.02em; color: var(--text-primary); margin-bottom: 4px;
+}
+.edu-degree { font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 4px; }
+.edu-period { font-size: 12px; color: var(--text-tertiary); }
+.edu-card.cert .edu-degree { color: var(--text-secondary); }
+
+/* ===== Footer ===== */
+.footer {
+  margin-top: 72px; padding: 32px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+.footer p { font-size: 12px; color: var(--text-tertiary); line-height: 1.8; }
+.footer a { color: var(--accent); text-decoration: none; }
+
+/* ===== Floating Contact Buttons ===== */
+.floating-contacts {
+  position: fixed; bottom: 24px; right: 24px;
+  z-index: 200; display: flex; flex-direction: column;
+  gap: 10px; align-items: flex-end;
+}
+.fab {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,113,227,0.35);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  opacity: 0; transform: scale(0) translateX(20px);
+}
+.fab.visible { opacity: 1; transform: scale(1) translateX(0); }
+.fab:hover {
+  transform: scale(1.1) translateX(0);
+  box-shadow: 0 6px 24px rgba(0,113,227,0.45);
+}
+.fab svg { width: 20px; height: 20px; }
+.fab-main {
+  transform: scale(0);
+}
+.fab-main.visible {
+  transform: scale(1);
+}
+.fab-menu {
+  overflow: hidden;
+  max-height: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  display: flex; flex-direction: column; gap: 10px;
+  align-items: flex-end;
+}
+.fab-menu.open { max-height: 200px; }
+.fab-menu .fab {
+  width: 42px; height: 42px;
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-card);
+  border: 1.5px solid var(--border);
+}
+.fab-menu .fab:hover {
+  background: var(--accent); color: #fff;
+  border-color: var(--accent);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { to { opacity: 1; transform: scale(1); } }
+@keyframes blink { 50% { border-color: transparent; } }
+
+/* Stagger delays for cards */
+.stagger-1 { transition-delay: 0.05s !important; }
+.stagger-2 { transition-delay: 0.10s !important; }
+.stagger-3 { transition-delay: 0.15s !important; }
+.stagger-4 { transition-delay: 0.20s !important; }
+.stagger-5 { transition-delay: 0.25s !important; }
+
+/* ===== Responsive ===== */
+@media (max-width: 720px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-photo { order: -1; }
+  .hero-photo img, .hero-photo-placeholder { width: 80px; height: 112px; }
+  .comp-grid { grid-template-columns: repeat(2, 1fr); }
+  .edu-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .exp-card-header { flex-direction: column; padding-left: 24px; }
+  .exp-header-right { flex-direction: row; align-items: center; }
+  .exp-card::before { left: 8px; }
+  .exp-list::before, #timeline-progress { left: 13px; }
+  .exp-card-header::after, .exp-card-body-inner { padding-left: 24px; }
+  .floating-contacts { bottom: 16px; right: 16px; }
+  .fab-main { width: 52px; height: 52px; }
+}
+@media (max-width: 480px) {
+  .page { padding: 76px 16px 60px; }
+  .hero-name { font-size: 36px; }
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Particle Canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- Nav -->
+<nav class="nav" id="main-nav">
+  <div class="nav-inner">
+    <span class="nav-name">於鑫君</span>
+    <ul class="nav-links">
+      <li><a href="#competency" data-section="competency">竞争力</a></li>
+      <li><a href="#experience" data-section="experience">工作经历</a></li>
+      <li><a href="#ai-projects" data-section="ai-projects">AI项目</a></li>
+      <li><a href="#education" data-section="education">教育背景</a></li>
+    </ul>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="var(--accent)" stroke="none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">AI Product Manager</div>
+      <h1 class="hero-name" id="hero-name"></h1>
+      <div class="hero-tags" id="hero-tags">
+        <span class="hero-tag accent">AI产品经理</span>
+        <span class="hero-tag">8年产品经验</span>
+        <span class="hero-tag">复旦工商管理</span>
+        <span class="hero-tag">PMP</span>
+        <span class="hero-tag">33岁 · 上海</span>
+      </div>
+      <div class="hero-contact">
+        <a class="contact-item" href="tel:13611971360">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.56a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          13611971360
+        </a>
+        <a class="contact-item" href="mailto:447290660@qq.com">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          447290660@qq.com
+        </a>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <img src="resume_photo.png" alt="於鑫君" onerror="this.parentElement.innerHTML='<div class=\'hero-photo-placeholder\'>👤</div>'">
+    </div>
+  </section>
+
+  <!-- ===== Core Competency ===== -->
+  <section class="section" id="competency">
+    <div class="section-header">
+      <span class="section-label">01</span>
+      <h2 class="section-title">核心竞争力</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="comp-grid">
+      <div class="comp-card stagger-1" data-tilt>
+        <div class="comp-card-icon"><div class="icon-ai"></div></div>
+        <div class="comp-card-title">AI技术落地</div>
+        <ul class="comp-card-items">
+          <li>SD部署 + LoRA微调</li>
+          <li>Deepfake接入</li>
+          <li>RAG + 多LLM路由</li>
+          <li>Agent搭建</li>
+        </ul>
+      </div>
+      <div class="comp-card stagger-2" data-tilt>
+        <div class="comp-card-icon"><div class="icon-growth"></div></div>
+        <div class="comp-card-title">用户增长</div>
+        <ul class="comp-card-items">
+          <li>AARRR框架</li>
+          <li>裂变设计（多路径）</li>
+          <li>积分体系全链路</li>
+          <li>AB测试验证</li>
+        </ul>
+      </div>
+      <div class="comp-card stagger-3" data-tilt>
+        <div class="comp-card-icon"><div class="icon-algo"></div></div>
+        <div class="comp-card-title">推荐算法</div>
+        <ul class="comp-card-items">
+          <li>协同过滤 + 内容算法</li>
+          <li>权重 + 聚类模型</li>
+          <li>多目标排序</li>
+          <li>信息流中台设计</li>
+        </ul>
+      </div>
+      <div class="comp-card stagger-4" data-tilt>
+        <div class="comp-card-icon"><div class="icon-money"></div></div>
+        <div class="comp-card-title">商业化变现</div>
+        <ul class="comp-card-items">
+          <li>会员 + 广告双轨</li>
+          <li>商业化SDK聚合</li>
+          <li>动态广告切源</li>
+          <li>AI收益模型设计</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Layout Toggle ===== -->
+  <div id="layout-toggle-bar">
+    <span>AI项目位置：</span>
+    <button class="layout-btn" id="btn-before" onclick="setAILayout('before')">工作经历之前</button>
+    <button class="layout-btn" id="btn-after" onclick="setAILayout('after')">工作经历之后</button>
+  </div>
+
+  <!-- ===== AI Projects (movable) ===== -->
+  <div id="ai-projects-wrapper"></div>
+
+  <!-- ===== Work Experience ===== -->
+  <section class="section" id="experience">
+    <div class="section-header">
+      <span class="section-label">02</span>
+      <h2 class="section-title">工作经历</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="exp-list">
+      <div id="timeline-progress"></div>
+
+      <!-- 来远电子 -->
+      <div class="exp-card" id="card-0">
+        <div class="exp-card-header" onclick="toggleCard('card-0')">
+          <div class="exp-header-left">
+            <div class="exp-company">来远电子（芯片制造）</div>
+            <div class="exp-role">产品负责人（独立负责）</div>
+          </div>
+          <div class="exp-header-right">
+            <div class="exp-period">2024.05 – 2024.08</div>
+            <div class="exp-toggle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-body-inner">
+            <div class="bullet-list">
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>背景与痛点：</b>生产流程数据割裂——订单/委外/工程进度全靠人工统计，领导无法实时查阅全貌，独立完成系统底层框架设计</div>
+              </div>
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>系统设计：</b>可视化排期看板+智能预警系统，晶圆加工到封装测试全流程可查，销售-生产-交付全链条数字化贯通</div>
+              </div>
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>数据治理：</b>数据清洗+统一口径+标准化，存量资料迁移至系统归档，一期框架按时上线</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 二三四五 -->
+      <div class="exp-card open" id="card-1">
+        <div class="exp-card-header" onclick="toggleCard('card-1')">
+          <div class="exp-header-left">
+            <div class="exp-company">二三四五网络科技有限公司</div>
+            <div class="exp-role">产品经理 → 产品部负责人</div>
+          </div>
+          <div class="exp-header-right">
+            <div class="exp-period">2019.05 – 2023.07</div>
+            <div class="exp-toggle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-body-inner">
+            <div class="project-block">
+              <span class="project-name">① 青鸟壁纸 — AIGC技术落地与商业化</span>
+              <div class="bullet-list">
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text"><b>AIGC技术落地：</b>完成Stable Diffusion本地化部署，训练赛博朋克/二次元/水墨点彩等垂直风格LoRA模型，实现AI文生图在壁纸场景的产品化落地</div>
+                </div>
+                <div class="sub-bullet-item">
+                  <div class="dot-sub"></div>
+                  <div class="text">设计一键智能Prompt优化+提示词模板库，降低使用门槛，模板使用率85%；积累10万+UGC素材库</div>
+                </div>
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text"><b>商业化变现：</b>设计收益模型，日活<span class="counter" data-target="200" data-suffix="万">200万</span>，日均收入<span class="counter" data-target="10000" data-suffix="元">1万元</span>，会员日均增收<span class="counter" data-target="2000" data-suffix="元">2000元</span></div>
+                </div>
+              </div>
+              <div class="metrics-row">
+                <span class="metric-chip">DAU <span class="metric-num counter" data-target="200" data-suffix="万">200万</span></span>
+                <span class="metric-chip">日均收入 <span class="metric-num counter" data-target="10000" data-suffix="元">1万元</span></span>
+                <span class="metric-chip">模板使用率<span class="metric-num counter" data-target="85" data-suffix="%">85%</span></span>
+              </div>
+            </div>
+
+            <div class="project-block">
+              <span class="project-name">② 可映APP — AI图像技术商业化落地</span>
+              <div class="bullet-list">
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text"><b>AI图像功能落地：</b>主导上线「视频融脸Deepfake」「老照片修复」「变老变年轻」「照片运动」等AI图像处理功能，覆盖模板日均使用量<span class="counter" data-target="50" data-suffix="万次">50万次</span></div>
+                </div>
+                <div class="sub-bullet-item">
+                  <div class="dot-sub"></div>
+                  <div class="text">协同筛选开源模型，AB测试验证用户侧效果，达成"目标驱动+快速试错"的AI功能迭代闭环</div>
+                </div>
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text"><b>商业化：</b>会员付费+场景化广告变现，ARPU值0.3元（超同业均值50%）；从0做到DAU <span class="counter" data-target="35" data-suffix="万">35万</span>（行业Top5）</div>
+                </div>
+              </div>
+              <div class="metrics-row">
+                <span class="metric-chip">DAU <span class="metric-num counter" data-target="35" data-suffix="万">35万</span> 行业Top5</span>
+                <span class="metric-chip">日均使用 <span class="metric-num counter" data-target="50" data-suffix="万次">50万次</span></span>
+                <span class="metric-chip">ARPU超同业50%</span>
+              </div>
+            </div>
+
+            <div class="project-block">
+              <span class="project-name">③ 趣看看APP + 信息流中台 — 推荐算法与用户增长</span>
+              <div class="bullet-list">
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text"><b>推荐算法设计：</b>多目标推荐模型，融合协同过滤与内容相似度，"兴趣匹配度+内容新鲜度"双维度排序，支撑日均<span class="counter" data-target="1" data-suffix="亿+">1亿+</span>内容曝光</div>
+                </div>
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text"><b>用户增长：</b>积分体系全链路（获取+消费+风控），次留从<span class="counter" data-target="20" data-suffix="%">20%</span>→<span class="counter" data-target="38" data-suffix="%">38%</span>；裂变多路径，自增占比从0→30%</div>
+                </div>
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text"><b>核心成果：</b>DAU <span class="counter" data-target="40" data-suffix="万">40万</span>，信息流阅读时长提升<span class="counter" data-target="40" data-suffix="%">40%</span>，新闻点击率提升<span class="counter" data-target="65" data-suffix="%">65%</span></div>
+                </div>
+              </div>
+              <div class="metrics-row">
+                <span class="metric-chip">DAU <span class="metric-num counter" data-target="40" data-suffix="万">40万</span></span>
+                <span class="metric-chip">次留 <span class="metric-num counter" data-target="20" data-suffix="%→">20%→</span><span class="metric-num counter" data-target="38" data-suffix="%">38%</span></span>
+                <span class="metric-chip">阅读时长+<span class="metric-num counter" data-target="40" data-suffix="%">40%</span></span>
+              </div>
+            </div>
+
+            <div class="project-block">
+              <span class="project-name">④ hiLife物业管理SaaS — 复杂系统重构与跨国协作</span>
+              <div class="bullet-list">
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text">梳理三款APP历史业务逻辑，完成物业+社区+智能家居三业务整合，重构十大系统模块（用户体系/OMS-CMS权限/消息/设施预定/缴费/访客/会议/留言反馈/社区/智能家居）</div>
+                </div>
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text">整合新加坡+上海+成都三地团队，制定SOP+里程碑管理；中英双语工作环境，系统上线后成为<b>新加坡物业管理系统Top1</b></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="project-block">
+              <span class="project-name">⑤ PC产品矩阵运营与其他探索</span>
+              <div class="bullet-list">
+                <div class="bullet-item">
+                  <div class="dot"></div>
+                  <div class="text">主导2345安全卫士/软件管家/青鸟壁纸三款千万级DAU产品版本迭代与合规化改造；探索区块链+数字经济商业化，峰值月流水<span class="counter" data-target="100" data-suffix="万元">100万元</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 花动传媒 -->
+      <div class="exp-card" id="card-2">
+        <div class="exp-card-header" onclick="toggleCard('card-2')">
+          <div class="exp-header-left">
+            <div class="exp-company">上海花动传媒</div>
+            <div class="exp-role">增长产品经理</div>
+          </div>
+          <div class="exp-header-right">
+            <div class="exp-period">2018.05 – 2019.05</div>
+            <div class="exp-toggle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-body-inner">
+            <div class="bullet-list">
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>裂变增长：</b>惠头条——千万级新闻返现APP。邀请阶梯奖励+积分系统，自然流量占比20%→32%，拉新次留60%+，30日留存约30%</div>
+              </div>
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>走路赚钱：</b>从0设计游戏化功能，日均PV <span class="counter" data-target="1.2" data-suffix="亿">1.2亿</span>、UV <span class="counter" data-target="280" data-suffix="万">280万</span>、参与度70%+，日净收入<span class="counter" data-target="10" data-suffix="万元">10万元</span></div>
+              </div>
+            </div>
+            <div class="metrics-row">
+              <span class="metric-chip">DAU <span class="metric-num counter" data-target="1000" data-suffix="万">1000万</span></span>
+              <span class="metric-chip">净收入+<span class="metric-num counter" data-target="10" data-suffix="万/天">10万/天</span></span>
+              <span class="metric-chip">自增 <span class="metric-num counter" data-target="20" data-suffix="%→">20%→</span><span class="metric-num counter" data-target="32" data-suffix="%">32%</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 熵变网络 -->
+      <div class="exp-card" id="card-3">
+        <div class="exp-card-header" onclick="toggleCard('card-3')">
+          <div class="exp-header-left">
+            <div class="exp-company">上海熵变网络科技</div>
+            <div class="exp-role">产品助理</div>
+          </div>
+          <div class="exp-header-right">
+            <div class="exp-period">2017.03 – 2018.02</div>
+            <div class="exp-toggle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-body-inner">
+            <div class="bullet-list">
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text">萌趣APP泛二次元电商平台，负责种子用户维护、市场调研、首页运营位规划、商品SKU类目梳理等需求策划</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AI Project Experience (movable block - template) ===== -->
+  <template id="ai-section-tpl">
+  <section class="section visible" id="ai-projects-real">
+    <div class="section-header">
+      <span class="section-label">03</span>
+      <h2 class="section-title">AI项目经验</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="exp-list">
+      <div class="exp-card open" id="card-4">
+        <div class="exp-card-header" onclick="toggleCard('card-4')">
+          <div class="exp-header-left">
+            <div class="exp-company">MAGA股票分析系统 — 基于龙虾平台（WorkBuddy）</div>
+            <div class="exp-role">AI Agent应用 | 从0到1独立策划</div>
+          </div>
+          <div class="exp-header-right">
+            <div class="exp-period">2026</div>
+            <div class="exp-toggle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-body-inner">
+            <div class="bullet-list">
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>需求洞察：</b>发现个人量化投资的信息差痛点，用龙虾平台从0到1搭建MAGA股票分析系统，实现策略研究→数据采集→回测验证→荐股推送全链路自动化</div>
+              </div>
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>AI Agent应用：</b>利用龙虾的多Agent协作、定时任务、工具调用等能力，将分散的投资分析流程整合为端到端自动化工作流，替代人工盯盘与手动回测</div>
+              </div>
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>需求衍生：</b>使用过程中发现单窗口Agent无法满足多任务并行需求，基于龙虾平台设计并搭建了多任务协作的项目管理系统</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-card" id="card-5">
+        <div class="exp-card-header" onclick="toggleCard('card-5')">
+          <div class="exp-header-left">
+            <div class="exp-company">AI Agent「命理大师」— 基于Coze平台</div>
+            <div class="exp-role">AI应用开发 | 独立开发</div>
+          </div>
+          <div class="exp-header-right">
+            <div class="exp-period">2025</div>
+            <div class="exp-toggle">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="exp-card-body">
+          <div class="exp-card-body-inner">
+            <div class="bullet-list">
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>RAG知识库注入：</b>解决"八字测不准、命理分析方差大"核心痛点，注入测算书作为领域知识库，约束模型输出边界，统一计算方式</div>
+              </div>
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>多LLM路由策略：</b>设计分工式AI工作流——插件调用使用豆包工作流，数值计算使用DeepSeek模型，按任务类型选择最优模型</div>
+              </div>
+              <div class="bullet-item">
+                <div class="dot"></div>
+                <div class="text"><b>Workflow编排：</b>基于Coze搭建多步骤智能体工作流，实现从输入解析到结果输出的端到端自动化</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </template>
+
+  <!-- ===== Education ===== -->
+  <section class="section" id="education">
+    <div class="section-header">
+      <span class="section-label">04</span>
+      <h2 class="section-title">教育背景</h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="edu-grid">
+      <div class="edu-card stagger-1">
+        <div class="edu-card-icon">🎓</div>
+        <div class="edu-school">复旦大学</div>
+        <div class="edu-degree">工商管理硕士</div>
+        <div class="edu-period">2024.09 – 2027.03（在读）</div>
+      </div>
+      <div class="edu-card stagger-2 cert">
+        <div class="edu-card-icon">📋</div>
+        <div class="edu-school">PMP项目管理认证</div>
+        <div class="edu-degree">Project Management Professional</div>
+        <div class="edu-period">2023</div>
+      </div>
+      <div class="edu-card stagger-3">
+        <div class="edu-card-icon">⚗️</div>
+        <div class="edu-school">上海电力大学</div>
+        <div class="edu-degree">化学工程与工艺（学士）</div>
+        <div class="edu-period">2011.09 – 2015.06</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <p>於鑫君 · AI产品经理 · 上海</p>
+    <p><a href="tel:13611971360">13611971360</a> · <a href="mailto:447290660@qq.com">447290660@qq.com</a></p>
+  </footer>
+
+</div>
+
+<!-- Floating Contact Buttons -->
+<div class="floating-contacts" id="floating-contacts">
+  <div class="fab-menu" id="fab-menu">
+    <button class="fab" onclick="location.href='tel:13611971360'" title="电话" aria-label="拨打电话">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.56a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    </button>
+    <button class="fab" onclick="location.href='mailto:447290660@qq.com'" title="邮件" aria-label="发送邮件">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </button>
+  </div>
+  <button class="fab fab-main" id="fab-main" onclick="toggleFab()" aria-label="联系方式">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  </button>
+</div>
+
+<script>
+// ===== Theme =====
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+})();
+
+// ===== Typing Effect =====
+function typeText(el, text, speed, callback) {
+  let i = 0;
+  el.textContent = '';
+  function type() {
+    if (i < text.length) {
+      el.textContent += text.charAt(i++);
+      setTimeout(type, speed);
+    } else {
+      if (callback) callback();
+    }
+  }
+  type();
+}
+document.addEventListener('DOMContentLoaded', function() {
+  const nameEl = document.getElementById('hero-name');
+  typeText(nameEl, '於鑫君', 120, function() {
+    // cursor blinks after typing done
+    nameEl.style.borderRight = '3px solid var(--accent)';
+    nameEl.style.animation = 'blink 0.8s step-end infinite';
+  });
+});
+
+// ===== Particle Canvas =====
+(function() {
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let mouse = { x: null, y: null };
+  const isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  document.addEventListener('mousemove', function(e) {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  function createParticle() {
+    return {
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      radius: Math.random() * 2 + 1,
+      opacity: Math.random() * 0.5 + 0.2
+    };
+  }
+
+  for (let i = 0; i < 60; i++) particles.push(createParticle());
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const color = isDark() ? '10,132,255' : '0,113,227';
+
+    // Draw particles
+    particles.forEach(function(p) {
+      // Mouse interaction
+      if (mouse.x !== null) {
+        const dx = mouse.x - p.x;
+        const dy = mouse.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          p.vx += dx / dist * 0.01;
+          p.vy += dy / dist * 0.01;
+        }
+      }
+      p.x += p.vx;
+      p.y += p.vy;
+      // boundary bounce
+      if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + color + ',' + p.opacity + ')';
+      ctx.fill();
+    });
+
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 130) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba(' + color + ',' + (1 - dist / 130) * 0.15 + ')';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ===== Nav Scroll =====
+(function() {
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', function() {
+    nav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Active link highlight
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        navLinks.forEach(function(link) {
+          link.classList.remove('active');
+          if (link.getAttribute('data-section') === entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  sections.forEach(function(s) { observer.observe(s); });
+})();
+
+// ===== Scroll Reveal =====
+(function() {
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.section').forEach(function(el) { observer.observe(el); });
+})();
+
+// ===== Card Toggle =====
+function toggleCard(id) {
+  const card = document.getElementById(id);
+  card.classList.toggle('open');
+}
+
+// ===== AI Layout Toggle =====
+function initAISection() {
+  const tpl = document.getElementById('ai-section-tpl');
+  const frag = tpl.content.cloneNode(true);
+  document.getElementById('ai-projects-wrapper').appendChild(frag);
+}
+function setAILayout(mode) {
+  const aiSection = document.getElementById('ai-projects-real');
+  const expSection = document.getElementById('experience');
+  const eduSection = document.getElementById('education');
+  const toggleBar = document.getElementById('layout-toggle-bar');
+  const btnBefore = document.getElementById('btn-before');
+  const btnAfter = document.getElementById('btn-after');
+  if (!aiSection) return;
+  if (aiSection.parentNode) aiSection.parentNode.removeChild(aiSection);
+  if (mode === 'before') {
+    toggleBar.after(aiSection);
+    btnBefore.style.background = 'var(--accent)'; btnBefore.style.color = '#fff';
+    btnAfter.style.background = 'transparent'; btnAfter.style.color = 'var(--text-secondary)';
+  } else {
+    eduSection.before(aiSection);
+    btnAfter.style.background = 'var(--accent)'; btnAfter.style.color = '#fff';
+    btnBefore.style.background = 'transparent'; btnBefore.style.color = 'var(--text-secondary)';
+  }
+}
+initAISection();
+setAILayout('before');
+
+// ===== 3D Tilt Effect =====
+(function() {
+  const cards = document.querySelectorAll('[data-tilt]');
+  cards.forEach(function(card) {
+    card.addEventListener('mousemove', function(e) {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = (y - centerY) / 12;
+      const rotateY = (centerX - x) / 12;
+      card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale(1.03)';
+    });
+    card.addEventListener('mouseleave', function() {
+      card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)';
+    });
+  });
+})();
+
+// ===== Timeline Slide-in =====
+(function() {
+  const cards = document.querySelectorAll('.exp-card');
+  const progress = document.getElementById('timeline-progress');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('slide-in');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  cards.forEach(function(card) { observer.observe(card); });
+
+  // Update timeline progress on scroll
+  function updateProgress() {
+    const expSection = document.getElementById('experience');
+    if (!expSection) return;
+    const rect = expSection.getBoundingClientRect();
+    const sectionHeight = expSection.offsetHeight;
+    const scrolled = Math.max(0, -rect.top);
+    const progress_pct = Math.min(100, (scrolled / (sectionHeight - window.innerHeight)) * 100);
+    progress.style.height = Math.max(0, progress_pct) + '%';
+  }
+  window.addEventListener('scroll', updateProgress);
+})();
+
+// ===== Counter Animation =====
+(function() {
+  function animateCounter(el) {
+    const target = parseFloat(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1500;
+    const start = performance.now();
+    const isFloat = target % 1 !== 0;
+
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = target * eased;
+      el.textContent = (isFloat ? current.toFixed(1) : Math.floor(current)) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const counters = document.querySelectorAll('.counter');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting && !entry.target.dataset.animated) {
+        entry.target.dataset.animated = 'true';
+        animateCounter(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(function(c) { observer.observe(c); });
+})();
+
+// ===== Floating FAB =====
+(function() {
+  const fab = document.getElementById('fab-main');
+  const contacts = document.getElementById('floating-contacts');
+  const fabs = contacts.querySelectorAll('.fab');
+
+  // Show FABs after scrolling
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 400) {
+      fab.classList.add('visible');
+    } else {
+      fab.classList.remove('visible');
+      document.getElementById('fab-menu').classList.remove('open');
+    }
+  });
+})();
+
+function toggleFab() {
+  document.getElementById('fab-menu').classList.toggle('open');
+  // Animate menu items
+  const menu = document.getElementById('fab-menu');
+  const items = menu.querySelectorAll('.fab');
+  if (menu.classList.contains('open')) {
+    items.forEach(function(item, i) {
+      setTimeout(function() { item.classList.add('visible'); }, i * 60);
+    });
+  } else {
+    items.forEach(function(item) { item.classList.remove('visible'); });
+  }
+}
+
+// ===== Stagger for cards =====
+document.querySelectorAll('.comp-card, .edu-card').forEach(function(card, i) {
+  card.style.transitionDelay = (i * 0.07) + 's';
+});
+</script>
+
+</body>
+</html>
